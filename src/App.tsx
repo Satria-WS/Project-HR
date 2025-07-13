@@ -1,28 +1,88 @@
+// src/App.tsx
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { Layout } from './layout/Layout';
-import { Dashboard } from './pages/Dashboard';
-import { Projects } from './pages/Projects';
-import { ProjectDetails } from './pages/ProjectDetails';
-import { Tasks } from './pages/Tasks';
-import { Team } from './pages/Team';
-import { Reports } from './pages/Reports';
-import { Settings } from './pages/Settings';
+import { 
+  BrowserRouter as Router, 
+  Routes, 
+  Route, 
+  Navigate 
+} from 'react-router-dom';
+import { Layout } from './pages/layout/Layout';
+import { Dashboard } from './pages/layout/Dashboard/Dashboard';
+import { Projects } from './pages/Project/Projects';
+import { ProjectDetails } from './pages/Project/ProjectDetails';
+import { Tasks } from   './pages/Tasks';
+import { Team } from './pages/Team/Team';
+import { Login } from './pages/layout/login/login';
+
+// Create a ProtectedRoute component
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const isAuthenticated = !!localStorage.getItem('userProfile');
+
+  if (!isAuthenticated) {
+    // Redirect to login if not authenticated
+    return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
+};
 
 function App() {
   return (
     <Router>
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/projects" element={<Projects />} />
-          <Route path="/projects/:projectId" element={<ProjectDetails />} />
-          <Route path="/tasks" element={<Tasks />} />
-          <Route path="/team" element={<Team />} />
-          <Route path="/reports" element={<Reports />} />
-          <Route path="/settings" element={<Settings />} />
-        </Routes>
-      </Layout>
+      <Routes>
+        {/* Public Route */}
+        <Route path="/login" element={<Login />} />
+
+        {/* Protected Routes with Layout */}
+        <Route element={<Layout />}>
+          <Route 
+            path="/" 
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/projects" 
+            element={
+              <ProtectedRoute>
+                <Projects />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/projects/:projectId" 
+            element={
+              <ProtectedRoute>
+                <ProjectDetails />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/tasks" 
+            element={
+              <ProtectedRoute>
+                <Tasks />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/team" 
+            element={
+              <ProtectedRoute>
+                <Team />
+              </ProtectedRoute>
+            } 
+          />
+        </Route>
+
+        {/* Catch-all route */}
+        <Route 
+          path="*" 
+          element={<Navigate to="/login" replace />} 
+        />
+      </Routes>
     </Router>
   );
 }

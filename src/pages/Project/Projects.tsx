@@ -8,8 +8,8 @@ import {
   Users,
   Calendar
 } from 'lucide-react';
-import { useProjectStore } from '../store/projectStore';
-import { CreateProjectModal } from '../components/modals/CreateProjectModal';
+import { useProjectStore } from '../../store/projectStore';
+import { CreateProjectModal } from '../../components/modals/CreateProjectModal';
 
 export function Projects() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
