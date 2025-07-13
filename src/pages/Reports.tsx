@@ -31,10 +31,10 @@ import {
   ArcElement,
 } from 'chart.js';
 import { Line, Bar, Pie } from 'react-chartjs-2';
-import { ReportModal } from '../components/reports/ReportModal';
-import { CreateReportModal } from '../components/reports/CreateReportModal';
-import { EditReportModal } from '../components/reports/EditReportModal';
-import { ShareReportModal } from '../components/reports/ShareReportModal';
+import { ReportModal } from '../reports/ReportModal';
+import { CreateReportModal } from '../reports/CreateReportModal';
+import { EditReportModal } from '../reports/EditReportModal';
+import { ShareReportModal } from '../reports/ShareReportModal';
 
 ChartJS.register(
   CategoryScale,

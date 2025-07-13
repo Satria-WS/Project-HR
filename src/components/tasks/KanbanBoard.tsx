@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import { useProjectStore } from '../../store/projectStore';
-import { Task, Status } from '../../types';
+import { useProjectStore } from '@store/projectStore';
+import { Task, Status } from '@/interface/common';
 import { Clock, AlertCircle, CheckCircle2, Plus, Filter, Search } from 'lucide-react';
 import { TaskCard } from './TaskCard';
-import { EditTaskModal } from './EditTaskModal';
-import { CreateTaskModal } from './CreateTaskModal';
+import { CreateTaskModal } from '@/components/modals/CreateTaskModal';
 
 const COLUMNS: { id: Status; name: string; color: string }[] = [
   { id: 'To Do', name: 'To Do', color: 'bg-gray-100' },
@@ -201,20 +200,12 @@ export function KanbanBoard() {
       </div>
 
       {/* Modals */}
-      <EditTaskModal
-        isOpen={isEditModalOpen}
-        onClose={() => {
-          setIsEditModalOpen(false);
-          setSelectedTask(null);
-        }}
-        task={selectedTask}
-      />
 
       <CreateTaskModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
-        initialStatus={createTaskStatus}
-      />
+        
+        />
     </div>
   );
 }

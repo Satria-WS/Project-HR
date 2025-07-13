@@ -5,4 +5,4 @@ export interface TeamMember {
   role: 'admin' | 'member' | 'viewer';
   joinDate: Date;
   status: 'active' | 'inactive' | 'pending';
-} 
+}

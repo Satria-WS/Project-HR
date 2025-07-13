@@ -1,5 +1,5 @@
 import React from 'react';
-import { useProjectStore } from '../../store/projectStore';
+import { useProjectStore } from '@store/projectStore';
 import { 
   Bell,
   MessageSquare,
@@ -8,7 +8,7 @@ import {
   User,
   Check
 } from 'lucide-react';
-import { NotificationType } from '../../types';
+import { NotificationType } from '@interface/common';
 
 export function NotificationCenter() {
   const notifications = useProjectStore((state) => state.getUserNotifications('current-user')); // TODO: Get from auth context

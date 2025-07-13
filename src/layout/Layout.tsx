@@ -12,10 +12,10 @@ import {
   Settings,
   Plus
 } from 'lucide-react';
-import { CreateTaskModal } from './modals/CreateTaskModal';
-import { CreateProjectModal } from './modals/CreateProjectModal';
-import { AddTeamMemberModal } from './modals/AddTeamMemberModal';
-import { NotificationCenter } from './notifications/NotificationCenter';
+import { CreateTaskModal } from '../components/modals/CreateTaskModal';
+import { CreateProjectModal } from '../components/modals/CreateProjectModal';
+import { AddTeamMemberModal } from '../components/modals/AddTeamMemberModal';
+import { NotificationCenter } from '../components/notifications/NotificationCenter';
 
 interface LayoutProps {
   children: React.ReactNode;

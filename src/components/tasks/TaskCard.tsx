@@ -10,8 +10,8 @@ import {
   Paperclip,
   CheckCircle2
 } from 'lucide-react';
-import { Task, Priority, Status } from '../../types';
-import { useProjectStore } from '../../store/projectStore';
+import { Task, Priority, Status } from '@/interface/common';
+import { useProjectStore } from '@store/projectStore';
 
 interface TaskCardProps {
   task: Task;

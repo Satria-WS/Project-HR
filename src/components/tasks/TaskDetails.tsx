@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useProjectStore } from '../../store/projectStore';
+import { useProjectStore } from '@store/projectStore';
 import { 
   MessageSquare, 
   Paperclip, 
@@ -10,7 +10,7 @@ import {
   Tag,
   Trash2
 } from 'lucide-react';
-import { Task, Comment } from '../../types';
+import { Task, Comment } from '@/interface/common';
 
 interface TaskDetailsProps {
   task: Task;

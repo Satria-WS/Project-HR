@@ -20,7 +20,7 @@ import {
   CustomLabel,
   ReportCategory,
   TaskFile
-} from '../types';
+} from '../interface/common';
 
 interface ReportData {
   title: string;

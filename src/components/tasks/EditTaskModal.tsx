@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, Calendar, User, Flag, Tag } from 'lucide-react';
-import { useProjectStore } from '../../store/projectStore';
-import { Task, Priority, Status } from '../../types';
+import { useProjectStore } from '@store/projectStore';
+import { Task, Priority, Status } from '@/interface/common';
 
 interface EditTaskModalProps {
   isOpen: boolean;

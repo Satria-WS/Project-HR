@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
-import { useProjectStore } from '../../store/projectStore';
+import { useProjectStore } from '@store/projectStore';
 
 interface CreateProjectModalProps {
   isOpen: boolean;

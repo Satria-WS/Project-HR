@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useProjectStore } from '../../store/projectStore';
+import { useProjectStore } from '@store/projectStore';
 import { 
   FileText,
   Download,
@@ -7,7 +7,7 @@ import {
   User,
   BarChart2
 } from 'lucide-react';
-import { ReportPeriod, ReportFormat } from '../../types';
+import { ReportPeriod, ReportFormat } from '@/interface/common';
 
 export function ReportGenerator() {
   const [selectedPeriod, setSelectedPeriod] = useState<ReportPeriod>('Weekly');

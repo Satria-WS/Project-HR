@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X, Eye, EyeOff } from 'lucide-react';
-import { useProjectStore } from '../../store/projectStore';
+import { useProjectStore } from '@/store/projectStore';
 import { ReportPreview } from './ReportPreview';
 
 interface EditReportModalProps {

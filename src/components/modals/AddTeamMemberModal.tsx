@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
-import { useProjectStore } from '../../store/projectStore';
-import { Role } from '../../types';
+import { useProjectStore } from '@store/projectStore';
+import { Role } from '@interface/common';
+import type { TeamMember } from '@interface/TeamMember';
 
 interface AddTeamMemberModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onAddMember?: (member: Omit<TeamMember, 'id' | 'joinDate'>) => void;
 }
 
 export function AddTeamMemberModal({ isOpen, onClose }: AddTeamMemberModalProps) {

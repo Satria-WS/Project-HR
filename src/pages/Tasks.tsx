@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Plus, Search, Filter, List, Grid, Calendar as CalendarIcon } from 'lucide-react';
-import { KanbanBoard } from '../components/tasks/KanbanBoard';
-import { CreateTaskModal } from '../components/tasks/CreateTaskModal';
-import { useProjectStore } from '../store/projectStore';
+import { Plus, List, Grid, Calendar as CalendarIcon } from 'lucide-react';
+import { KanbanBoard } from '@/components/tasks/KanbanBoard';
+import { CreateTaskModal } from '@/components/modals/CreateTaskModal';
+import { useProjectStore } from '@store/projectStore';
 
 export function Tasks() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
