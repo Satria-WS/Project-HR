@@ -1,68 +1,115 @@
-// src/lib/googleAuth.ts
-import { jwtDecode } from 'jwt-decode';
-
-interface GoogleUserInfo {
-  sub: string;
-  name: string;
-  email: string;
-  picture: string;
-  email_verified: boolean;
-}
+import { GoogleCredentialResponse } from './types';
 
 export class GoogleAuthService {
   private static CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+  private static REDIRECT_URI = 'http://localhost:5173/login';
+  private static scriptLoaded = false;
 
-  // Dynamic script loading for Google Sign-In
-  static initGoogleAuth() {
-    const script = document.createElement('script');
-    script.src = 'https://accounts.google.com/gsi/client';
-    script.async = true;
-    script.defer = true;
-    document.body.appendChild(script);
+  // Initialize Google Sign-In
+  static initGoogleAuth(): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      // Prevent multiple script loads
+      if (this.scriptLoaded) {
+        resolve(true);
+        return;
+      }
+
+      // Check if script is already loaded
+      if (window.google?.accounts?.id) {
+        this.scriptLoaded = true;
+        resolve(true);
+        return;
+      }
+
+      const script = document.createElement('script');
+      script.src = 'https://accounts.google.com/gsi/client';
+      script.async = true;
+      script.defer = true;
+
+      script.onload = () => {
+        // Initialize Google Sign-In
+        window.google?.accounts.id.initialize({
+          client_id: this.CLIENT_ID,
+          callback: this.handleGoogleSignIn
+        });
+
+        this.scriptLoaded = true;
+        resolve(true);
+      };
+
+      script.onerror = () => {
+        console.error('Failed to load Google Sign-In script');
+        reject(false);
+      };
+
+      document.head.appendChild(script);
+    });
   }
 
-  // Token decoding with error handling
-  static decodeGoogleToken(token: string): GoogleUserInfo {
+  // Handle Google Sign-In Callback
+  static handleGoogleSignIn(response: GoogleCredentialResponse) {
+    if (!response.credential) {
+      console.error('No credential received');
+      return;
+    }
+
     try {
-      return jwtDecode<GoogleUserInfo>(token);
+      // Decode the JWT token
+      const userInfo = this.decodeGoogleToken(response.credential);
+      
+      // Store user information
+      localStorage.setItem('userProfile', JSON.stringify(userInfo));
+      
+      // Redirect to dashboard or home page
+      window.location.href = '/dashboard';
     } catch (error) {
-      console.error('Token decoding failed', error);
-      throw new Error('Invalid token');
+      console.error('Google Sign-In failed', error);
     }
   }
 
-  // Google Sign-In initialization and callback handling
-  static handleGoogleSignIn(callback: (userInfo: GoogleUserInfo) => void) {
-    if (window.google) {
-      window.google.accounts.id.initialize({
-        client_id: this.CLIENT_ID,
-        callback: (response) => {
-          try {
-            const userObject = this.decodeGoogleToken(response.credential);
-            callback(userObject);
-          } catch (error) {
-            console.error('Google Sign-In Error', error);
-          }
-        }
-      });
-    }
+  // Decode Google JWT Token
+  static decodeGoogleToken(token: string): GoogleUserInfo {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace('-', '+').replace('_', '/');
+    const payload = JSON.parse(window.atob(base64));
+
+    return {
+      id: payload.sub,
+      email: payload.email,
+      name: payload.name,
+      picture: payload.picture
+    };
   }
 
-  // Button rendering with customizable options
-  static renderGoogleButton(elementId: string, options?: any) {
-    if (window.google) {
+  // Render Google Sign-In Button
+  static renderGoogleButton(elementId: string) {
+    if (!window.google?.accounts?.id) {
+      console.error('Google Sign-In script not loaded');
+      return;
+    }
+
+    try {
       window.google.accounts.id.renderButton(
-        document.getElementById(elementId),
-        {
-          theme: 'outline',
-          size: 'large',
-          type: 'standard',
-          text: 'signin_with',
-          shape: 'rectangular',
-          logo_alignment: 'left',
-          ...options
+        document.getElementById(elementId)!,
+        { 
+          type: 'standard', 
+          theme: 'outline', 
+          size: 'large', 
+          text: 'continue_with', 
+          shape: 'rectangular', 
+          logo_alignment: 'center' 
         }
       );
+    } catch (error) {
+      console.error('Failed to render Google Sign-In button', error);
     }
   }
+}
+
+// Define user info interface
+export interface GoogleUserInfo {
+  id: string;
+  email: string;
+  name: string;
+  picture: string;
 }

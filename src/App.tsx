@@ -6,7 +6,7 @@ import {
   Route, 
   Navigate 
 } from 'react-router-dom';
-import { Layout } from './pages/layout/Layout';
+import { Layout } from './pages/layout/layout';
 import { Dashboard } from './pages/layout/Dashboard/Dashboard';
 import { Projects } from './pages/Project/Projects';
 import { ProjectDetails } from './pages/Project/ProjectDetails';
