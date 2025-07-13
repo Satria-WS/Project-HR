@@ -1,65 +1,135 @@
 // src/pages/layout/login/login.tsx
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { LogIn, Shield, Lock } from 'lucide-react';
+import { Shield, Lock, AlertCircle } from 'lucide-react';
 import { GoogleAuthService } from '@/lib/googleAuth';
+import { GoogleUserInfo, AuthError } from '@/lib/types';
 
 export function Login() {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isInitializing, setIsInitializing] = useState(true);
 
   useEffect(() => {
-    // Check existing authentication
-    const userProfile = localStorage.getItem('userProfile');
-    if (userProfile) {
-      navigate('/dashboard');
-      return;
-    }
-
-    // Initialize Google Sign-In
-    GoogleAuthService.initGoogleAuth();
-
-    // Setup Sign-In callback
-    GoogleAuthService.handleGoogleSignIn(
-      (userInfo) => {
-        setIsLoading(true);
-        try {
-          // Store user information securely
-          localStorage.setItem('userProfile', JSON.stringify({
-            id: userInfo.sub,
-            name: userInfo.name,
-            email: userInfo.email,
-            picture: userInfo.picture,
-            emailVerified: userInfo.email_verified
-          }));
-
-          // Simulate a slight delay to show loading state
-          setTimeout(() => {
-            setIsLoading(false);
-            navigate('/dashboard');
-          }, 500);
-        } catch (err) {
-          setError('Authentication failed. Please try again.');
-          setIsLoading(false);
-        }
-      },
-      (error) => {
-        setError(error.message);
-        setIsLoading(false);
-      }
-    );
-
-    // Render Google Sign-In button
-    GoogleAuthService.renderGoogleButton('googleSignInButton');
-
-    // Cleanup
+    initializeAuth();
+    
+    // Cleanup on unmount
     return () => {
-      if (window.google) {
-        window.google.accounts.id.cancel();
-      }
+      GoogleAuthService.cleanup();
     };
-  }, [navigate]);
+  }, []);
+
+  const initializeAuth = async () => {
+    try {
+      setIsInitializing(true);
+      setError(null);
+
+      // Check if user is already authenticated
+      if (GoogleAuthService.isAuthenticated()) {
+        navigate('/', { replace: true });
+        return;
+      }
+
+      // Initialize Google Auth
+      const initialized = await GoogleAuthService.initGoogleAuth();
+      if (!initialized) {
+        throw new Error('Failed to initialize Google Authentication');
+      }
+
+      // Setup Google Sign-In with callbacks
+      GoogleAuthService.setupGoogleSignIn(
+        handleAuthSuccess,
+        handleAuthError
+      );
+
+      // Render the Google Sign-In button
+      setTimeout(() => {
+        const buttonRendered = GoogleAuthService.renderGoogleButton('googleSignInButton', {
+          theme: 'outline',
+          size: 'large',
+          text: 'continue_with',
+          shape: 'rectangular'
+        });
+
+        if (!buttonRendered) {
+          setError('Failed to render Google Sign-In button. Please refresh the page.');
+        }
+      }, 100);
+
+    } catch (err) {
+      console.error('Auth initialization error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to initialize authentication');
+    } finally {
+      setIsInitializing(false);
+    }
+  };
+
+  const handleAuthSuccess = (userInfo: GoogleUserInfo) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      // Store user information securely
+      const userProfile = {
+        id: userInfo.id || userInfo.sub,
+        name: userInfo.name,
+        email: userInfo.email,
+        picture: userInfo.picture,
+        emailVerified: userInfo.email_verified || false
+      };
+
+      localStorage.setItem('userProfile', JSON.stringify(userProfile));
+
+      // Navigate to dashboard with a slight delay for better UX
+      setTimeout(() => {
+        setIsLoading(false);
+        navigate('/', { replace: true });
+      }, 500);
+
+    } catch (err) {
+      console.error('Error storing user profile:', err);
+      setError('Failed to save user information. Please try again.');
+      setIsLoading(false);
+    }
+  };
+
+  const handleAuthError = (authError: AuthError) => {
+    console.error('Authentication error:', authError);
+    setIsLoading(false);
+    
+    // Provide user-friendly error messages
+    let errorMessage = 'Authentication failed. Please try again.';
+    
+    switch (authError.code) {
+      case 'SETUP_ERROR':
+        errorMessage = 'Failed to setup authentication. Please refresh the page.';
+        break;
+      case 'AUTH_ERROR':
+        errorMessage = authError.message || 'Authentication failed. Please try again.';
+        break;
+      default:
+        errorMessage = authError.message || errorMessage;
+    }
+    
+    setError(errorMessage);
+  };
+
+  const handleRetry = () => {
+    setError(null);
+    initializeAuth();
+  };
+
+  if (isInitializing) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 to-purple-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500 mx-auto mb-4"></div>
+          <p className="text-gray-600">Initializing authentication...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-indigo-100 to-purple-100 px-4 py-8">
@@ -85,39 +155,28 @@ export function Login() {
 
           {/* Error Message */}
           {error && (
-            <div className="bg-red-50 border border-red-300 text-red-800 px-4 py-3 rounded-lg mb-4 flex items-center">
-              <Lock className="mr-2 h-5 w-5 text-red-500" />
-              <span>{error}</span>
+            <div className="bg-red-50 border border-red-300 text-red-800 px-4 py-3 rounded-lg mb-4">
+              <div className="flex items-start">
+                <AlertCircle className="mr-2 h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <span className="block text-sm">{error}</span>
+                  <button
+                    onClick={handleRetry}
+                    className="mt-2 text-sm text-red-600 hover:text-red-800 underline"
+                  >
+                    Try again
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 
           {/* Google Sign-In Button Container */}
-          <div 
-            id="googleSignInButton" 
-            className="w-full flex justify-center"
-          >
-            {/* Fallback button if Google button doesn't render */}
-            {!isLoading && (
-              <button 
-                className="w-full flex items-center justify-center py-3 px-4 
-                border border-gray-300 rounded-lg shadow-md 
-                text-gray-700 bg-white hover:bg-gray-50 
-                transition duration-300 ease-in-out transform hover:scale-[1.02]"
-              >
-                <svg 
-                  className="w-6 h-6 mr-3" 
-                  xmlns="http://www.w3.org/2000/svg" 
-                  viewBox="0 0 48 48"
-                >
-                  {/* Google SVG Icon */}
-                  <path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/>
-                  <path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.32-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/>
-                  <path fill="#FBBC05" d="M11.68 28.18c-.75-2.24-1.16-4.64-1.16-7.18s.41-4.94 1.16-7.18V8.02H4.34C2.85 10.94 2 14.35 2 18s.85 7.06 2.34 9.98l7.34-5.8z"/>
-                  <path fill="#EA4335" d="M24 9.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 3.29 29.93 1 24 1 15.4 1 7.96 5.93 4.34 13.02l7.34 5.8c1.74-5.2 6.59-9.07 12.32-9.07z"/>
-                </svg>
-                Continue with Google
-              </button>
-            )}
+          <div className="w-full">
+            <div 
+              id="googleSignInButton" 
+              className="w-full flex justify-center mb-4"
+            />
           </div>
 
           {/* Loading Indicator */}

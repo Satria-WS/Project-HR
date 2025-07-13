@@ -1,4 +1,6 @@
 // src/types/global.d.ts
+import { GoogleCredentialResponse, GoogleButtonConfig } from '../lib/types';
+
 declare global {
   interface Window {
     google?: {
@@ -6,12 +8,15 @@ declare global {
         id: {
           initialize: (config: {
             client_id: string;
-            callback: (response: { credential: string }) => void;
+            callback: (response: GoogleCredentialResponse) => void;
+            auto_select?: boolean;
+            cancel_on_tap_outside?: boolean;
           }) => void;
-          renderButton: (element: HTMLElement | null, options: any) => void;
+          renderButton: (element: HTMLElement | null, options: GoogleButtonConfig) => void;
           cancel: () => void;
           revoke: () => void;
           prompt: () => void;
+          disableAutoSelect: () => void;
         }
       }
     };

@@ -9,23 +9,34 @@ export interface GoogleUserInfo {
   email: string;
   name: string;
   picture: string;
+  email_verified?: boolean;
+  sub?: string;
 }
 
-// Extend window object to include Google Sign-In types
-declare global {
-  interface Window {
-    google?: {
-      accounts: {
-        id: {
-          initialize: (config: {
-            client_id: string;
-            callback: (response: GoogleCredentialResponse) => void;
-          }) => void;
-          renderButton: (element: HTMLElement | null, options: unknown) => void;
-          prompt: () => void;
-          cancel: () => void;
-        }
-      }
-    }
-  }
-} 
+export interface GoogleButtonConfig {
+  type?: 'standard' | 'icon';
+  theme?: 'outline' | 'filled_blue' | 'filled_black';
+  size?: 'large' | 'medium' | 'small';
+  text?: 'signin_with' | 'signup_with' | 'continue_with' | 'signin';
+  shape?: 'rectangular' | 'pill' | 'circle' | 'square';
+  logo_alignment?: 'left' | 'center';
+  width?: string;
+  locale?: string;
+}
+
+export interface AuthError {
+  code: string;
+  message: string;
+  details?: unknown;
+}
+
+export interface AuthState {
+  isLoading: boolean;
+  isAuthenticated: boolean;
+  user: GoogleUserInfo | null;
+  error: AuthError | null;
+}
+
+// Callback types for authentication
+export type AuthSuccessCallback = (userInfo: GoogleUserInfo) => void;
+export type AuthErrorCallback = (error: AuthError) => void;
