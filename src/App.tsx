@@ -6,13 +6,13 @@ import {
   Route, 
   Navigate 
 } from 'react-router-dom';
-import { Layout } from './pages/layout/layout';
-import { Dashboard } from './pages/layout/Dashboard/Dashboard';
-import { Projects } from './pages/Project/Projects';
-import { ProjectDetails } from './pages/Project/ProjectDetails';
-import { Tasks } from   './pages/Tasks';
-import { Team } from './pages/Team/Team';
-import { Login } from './pages/layout/login/login';
+import { Layout } from '@/components/layout/Layout';
+import { Dashboard } from './pages/dashboard';
+import { Projects } from './pages/projects';
+import { ProjectDetails } from './pages/projects/[id]';
+import { Tasks } from './pages/tasks';
+import { Team } from './pages/team';
+import { Login } from './pages/auth/Login';
 
 // Create a ProtectedRoute component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {

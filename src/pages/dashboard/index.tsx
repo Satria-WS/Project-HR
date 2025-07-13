@@ -2,8 +2,8 @@
 import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { useProjectManagement } from '@/hooks/useProjectManagement';
-import { DashboardStats } from './_component/DashboardStats';
-import { QuickActions } from './_component/QuickActions';
+import { DashboardStats } from '@/components/features/dashboard/DashboardStats';
+import { QuickActions } from '@/components/features/dashboard/QuickActions';
 import { CreateTaskModal } from '@components/modals/CreateTaskModal';
 import { CreateProjectModal } from '@components/modals/CreateProjectModal';
 import { AddTeamMemberModal } from '@components/modals/AddTeamMemberModal';

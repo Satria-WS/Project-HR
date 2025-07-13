@@ -8,7 +8,7 @@ import {
   User,
   Check
 } from 'lucide-react';
-import { NotificationType } from '@interface/common';
+import { NotificationType } from '@types/interfaces/common';
 
 export function NotificationCenter() {
   const notifications = useProjectStore((state) => state.getUserNotifications('current-user')); // TODO: Get from auth context
