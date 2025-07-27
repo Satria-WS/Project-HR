@@ -20,8 +20,4 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
-  define: {
-    // Fallback for environment variables if .env is not working
-    'import.meta.env.VITE_GOOGLE_CLIENT_ID': JSON.stringify(process.env.VITE_GOOGLE_CLIENT_ID || '614508406727-jj1l2blt4u74rrvs0t9kriv8kof8v48o.apps.googleusercontent.com'),
-  },
 });
