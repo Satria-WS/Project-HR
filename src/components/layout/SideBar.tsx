@@ -1,9 +1,10 @@
 // src/pages/layout/Sidebar.tsx
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { LogOut, User, ChevronDown } from 'lucide-react';
 import { NAVIGATION_ITEMS } from '@/config/navigation';
 import { GoogleAuthService } from '@/lib/googleAuth';
+import { UserAvatar } from '@/components/ui';
 
 export function Sidebar() {
   const location = useLocation();
@@ -15,13 +16,19 @@ export function Sidebar() {
   const getCurrentUser = () => {
     try {
       const userProfile = localStorage.getItem('userProfile');
-      return userProfile ? JSON.parse(userProfile) : null;
-    } catch {
+      if (!userProfile) return null;
+      
+      const user = JSON.parse(userProfile);
+      console.log('Current user data:', user); // Debug log
+      return user;
+    } catch (error) {
+      console.error('Error parsing user profile:', error);
       return null;
     }
   };
 
   const currentUser = getCurrentUser();
+  
 
   // Handle click outside to close user menu
   useEffect(() => {
@@ -96,17 +103,12 @@ export function Sidebar() {
               className="w-full flex items-center px-4 py-3 text-left hover:bg-gray-50 rounded-md transition-colors duration-200"
             >
               <div className="flex items-center flex-1">
-                {currentUser.picture ? (
-                  <img
-                    src={currentUser.picture}
-                    alt={currentUser.name}
-                    className="w-8 h-8 rounded-full mr-3"
-                  />
-                ) : (
-                  <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center mr-3">
-                    <User className="w-4 h-4 text-indigo-600" />
-                  </div>
-                )}
+                <UserAvatar
+                  src={currentUser.picture}
+                  name={currentUser.name}
+                  size="md"
+                  className="mr-3"
+                />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-900 truncate">
                     {currentUser.name}

@@ -5,7 +5,7 @@ import {
   AuthError,
   AuthSuccessCallback,
   AuthErrorCallback 
-} from './types';
+} from '../types/interfaces/auth';
 
 export class GoogleAuthService {
   private static CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
