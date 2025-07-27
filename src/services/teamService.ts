@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { TeamMember } from '@types/interfaces/TeamMember';
+import type { TeamMember } from '../types/interfaces/TeamMember';
 
 class TeamService {
   private baseUrl = '/api/team';
