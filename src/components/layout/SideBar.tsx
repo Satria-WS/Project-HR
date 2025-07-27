@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { LogOut, User, ChevronDown } from 'lucide-react';
 import { NAVIGATION_ITEMS } from '@/config/navigation';
-import { GoogleAuthService } from '@/lib/googleAuth';
+import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 import { UserAvatar } from '@/components/ui';
 
 export function Sidebar() {
@@ -11,24 +11,9 @@ export function Sidebar() {
   const navigate = useNavigate();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
-
-  // Get current user from localStorage
-  const getCurrentUser = () => {
-    try {
-      const userProfile = localStorage.getItem('userProfile');
-      if (!userProfile) return null;
-      
-      const user = JSON.parse(userProfile);
-      console.log('Current user data:', user); // Debug log
-      return user;
-    } catch (error) {
-      console.error('Error parsing user profile:', error);
-      return null;
-    }
-  };
-
-  const currentUser = getCurrentUser();
   
+  // Use Supabase auth instead of localStorage
+  const { user, profile, signOut, loading } = useSupabaseAuth();
 
   // Handle click outside to close user menu
   useEffect(() => {
@@ -47,17 +32,13 @@ export function Sidebar() {
     };
   }, [showUserMenu]);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     try {
-      // Clear user data
-      GoogleAuthService.signOut();
-      
-      // Navigate to login
+      await signOut();
       navigate('/login', { replace: true });
     } catch (error) {
       console.error('Logout error:', error);
-      // Force logout even if there's an error
-      localStorage.removeItem('userProfile');
+      // Force navigation even if there's an error
       navigate('/login', { replace: true });
     }
   };
@@ -96,7 +77,7 @@ export function Sidebar() {
 
       {/* User Profile Section */}
       <div className="mt-auto border-t border-gray-200 pt-4">
-        {currentUser ? (
+        {user && profile ? (
           <div className="relative" ref={userMenuRef}>
             <button
               onClick={() => setShowUserMenu(!showUserMenu)}
@@ -104,17 +85,17 @@ export function Sidebar() {
             >
               <div className="flex items-center flex-1">
                 <UserAvatar
-                  src={currentUser.picture}
-                  name={currentUser.name}
+                  src={profile.avatar_url}
+                  name={profile.full_name || user.email}
                   size="md"
                   className="mr-3"
                 />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-gray-900 truncate">
-                    {currentUser.name}
+                    {profile.full_name || user.email}
                   </p>
                   <p className="text-xs text-gray-500 truncate">
-                    {currentUser.email}
+                    {user.email}
                   </p>
                 </div>
               </div>
@@ -136,13 +117,19 @@ export function Sidebar() {
           </div>
         ) : (
           <div className="px-4 py-3">
-            <button
-              onClick={() => navigate('/login')}
-              className="w-full flex items-center justify-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors duration-200"
-            >
-              <User className="w-4 h-4 mr-2" />
-              Sign In
-            </button>
+            {loading ? (
+              <div className="w-full flex items-center justify-center px-4 py-2">
+                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-indigo-600"></div>
+              </div>
+            ) : (
+              <button
+                onClick={() => navigate('/login')}
+                className="w-full flex items-center justify-center px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors duration-200"
+              >
+                <User className="w-4 h-4 mr-2" />
+                Sign In
+              </button>
+            )}
           </div>
         )}
       </div>
