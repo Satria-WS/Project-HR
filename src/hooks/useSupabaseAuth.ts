@@ -22,6 +22,17 @@ export function useSupabaseAuth() {
     const getInitialSession = async () => {
       try {
         console.log('Getting initial session...');
+        
+        // Check if we have auth tokens in URL hash (OAuth callback)
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const accessToken = hashParams.get('access_token');
+        
+        if (accessToken) {
+          console.log('Found access token in URL, processing OAuth callback...');
+          // Clear the hash from URL
+          window.history.replaceState(null, '', window.location.pathname);
+        }
+        
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
@@ -154,13 +165,43 @@ export function useSupabaseAuth() {
   };
 
   const signOut = async () => {
-    setLoading(true);
-    const result = await auth.signOut();
-    setUser(null);
-    setSession(null);
-    setProfile(null);
-    setLoading(false);
-    return result;
+    try {
+      setLoading(true);
+      console.log('Starting logout process...');
+      
+      // Sign out from Supabase
+      const { error } = await auth.signOut();
+      
+      if (error) {
+        console.error('Supabase signOut error:', error);
+        // Continue with local cleanup even if Supabase signOut fails
+      } else {
+        console.log('Supabase signOut successful');
+      }
+      
+      // Clear local state immediately
+      setUser(null);
+      setSession(null);
+      setProfile(null);
+      
+      // Clear any cached session data
+      localStorage.removeItem('sb-uttiucryupaszmzfphhs-auth-token');
+      
+      console.log('Logout completed successfully');
+      
+      return { error: null };
+    } catch (error) {
+      console.error('Unexpected error during logout:', error);
+      
+      // Even if there's an error, clear local state
+      setUser(null);
+      setSession(null);
+      setProfile(null);
+      
+      return { error };
+    } finally {
+      setLoading(false);
+    }
   };
 
   const updateProfile = async (updates: Partial<Profile>) => {

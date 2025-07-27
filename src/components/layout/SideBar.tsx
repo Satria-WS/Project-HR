@@ -34,12 +34,26 @@ export function Sidebar() {
 
   const handleLogout = async () => {
     try {
-      await signOut();
+      console.log('Logout button clicked');
+      setShowUserMenu(false); // Close menu immediately
+      
+      const { error } = await signOut();
+      
+      if (error) {
+        console.error('Logout error:', error);
+      } else {
+        console.log('Logout successful');
+      }
+      
+      // Navigate to login regardless of logout result
       navigate('/login', { replace: true });
+      
+      // Force page reload to clear any remaining state
+      window.location.href = '/login';
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error('Unexpected logout error:', error);
       // Force navigation even if there's an error
-      navigate('/login', { replace: true });
+      window.location.href = '/login';
     }
   };
 

@@ -37,10 +37,23 @@ export const auth = {
   },
 
   signInWithGoogle: async () => {
+    // Determine the correct redirect URL based on environment
+    const isDevelopment = window.location.hostname === 'localhost';
+    const baseUrl = isDevelopment 
+      ? window.location.origin 
+      : 'https://satria-ws.github.io';
+    const basePath = isDevelopment ? '' : '/Project-HR';
+    const redirectUrl = `${baseUrl}${basePath}/auth/callback`;
+    
+    console.log('Environment:', isDevelopment ? 'development' : 'production');
+    console.log('OAuth redirect URL:', redirectUrl);
+    
+    // Note: OAuth configuration must be set up in Supabase dashboard
+    // This will redirect to Google OAuth, then back to our callback URL
     return await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/dashboard`,
+        redirectTo: redirectUrl,
         queryParams: {
           access_type: 'offline',
           prompt: 'consent',
@@ -50,7 +63,31 @@ export const auth = {
   },
 
   signOut: async () => {
-    return await supabase.auth.signOut();
+    try {
+      console.log('Initiating Supabase signOut...');
+      
+      // Sign out from Supabase
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        console.error('Supabase signOut error:', error);
+      }
+      
+      // Clear any Google OAuth state if applicable
+      if (window.google?.accounts?.id) {
+        try {
+          window.google.accounts.id.cancel();
+          window.google.accounts.id.disableAutoSelect();
+        } catch (googleError) {
+          console.warn('Google signOut error:', googleError);
+        }
+      }
+      
+      return { error };
+    } catch (error) {
+      console.error('Unexpected signOut error:', error);
+      return { error };
+    }
   },
 
   getCurrentUser: () => {

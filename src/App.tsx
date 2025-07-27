@@ -13,6 +13,7 @@ import { Tasks } from './pages/tasks';
 import { Team } from './pages/team';
 import { Login } from './pages/auth/Login';
 import { SupabaseLogin } from './pages/auth/SupabaseLogin';
+import { OAuthCallback } from '@/components/auth';
 import { useSupabaseAuth } from '@/hooks/useSupabaseAuth';
 
 // Create a ProtectedRoute component
@@ -38,11 +39,12 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 function App() {
   return (
-    <Router>
+    <Router basename="/Project-HR">
       <Routes>
         {/* Public Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/supabase-login" element={<SupabaseLogin />} />
+        <Route path="/auth/callback" element={<OAuthCallback />} />
 
         {/* Protected Routes with Layout */}
         <Route element={<Layout />}>
