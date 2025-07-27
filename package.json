@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://Satria-WS.github.io/Project-HR",
+  "homepage": "https://Satria-WS.github.io/Project-HR/",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
